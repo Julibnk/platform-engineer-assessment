@@ -1,6 +1,8 @@
 import type { DataRequest, DataResponse, MasterdataResponse } from '@octane11/shared';
 
-const BASE = import.meta.env.VITE_API_URL as string;
+// Fail loud at module load if the API URL is missing — silent 404s are worse than a boot error.
+const BASE = import.meta.env.VITE_API_URL;
+if (!BASE) throw new Error('VITE_API_URL is not set');
 
 export async function fetchMasterdata(): Promise<MasterdataResponse> {
   const res = await fetch(`${BASE}/masterdata`);
