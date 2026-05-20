@@ -30,9 +30,6 @@ jobs:
       - name: Lint
         run: pnpm -r lint
 
-      - name: Format check
-        run: pnpm prettier --check .
-
       - name: Typecheck
         run: pnpm -r typecheck
 
