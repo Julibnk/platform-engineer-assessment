@@ -19,21 +19,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm # keyed off pnpm-lock.yaml
+          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      # shared must be compiled before api/web can typecheck against its types
-      - run: pnpm --filter @octane11/shared build
+      - name: Build shared
+        run: pnpm --filter @octane11/shared build
 
-      - run: pnpm -r lint
-      - run: pnpm -r typecheck
-      - run: pnpm --filter @octane11/api test
-      - run: pnpm --filter @octane11/web build
+      - name: Lint
+        run: pnpm -r lint
+
+      - name: Format check
+        run: pnpm prettier --check .
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Test
+        run: pnpm --filter @octane11/api test
+
+      - name: Build web
+        run: pnpm --filter @octane11/web build
 
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v6
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: api/Dockerfile
