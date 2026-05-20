@@ -1,0 +1,15 @@
+{
+  "name": "octane11",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,web \"pnpm --filter @octane11/api dev\" \"pnpm --filter @octane11/web dev\"",
+    "build": "pnpm --filter @octane11/shared build && pnpm --filter @octane11/api build && pnpm --filter @octane11/web build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @octane11/api test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
