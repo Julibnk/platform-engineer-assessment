@@ -38,8 +38,8 @@ export type DataResponse = {
 };
 
 export type MasterdataResponse = {
-  metrics: Record<string, { label: string; kind: MetricKind }>;
-  dimensions: Record<string, { label: string; kind: DimensionKind }>;
+  metrics: Record<MetricKey, { label: string; kind: MetricKind }>;
+  dimensions: Record<DimensionKey, { label: string; kind: DimensionKind }>;
   campaigns: string[];
   accounts: string[];
   channels: string[];

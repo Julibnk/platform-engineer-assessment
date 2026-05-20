@@ -16,6 +16,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 // Dimensions valid as group-by pivots — a subset of all dimensions.
 const GROUP_BY_VALUES = ['campaign', 'account', 'channel'] as const satisfies readonly DimensionKey[];
+type GroupBy = (typeof GROUP_BY_VALUES)[number];
+
+// Hoisted outside the component so nuqs sees a stable parser identity across renders.
+const searchParams = {
+  groupBy: parseAsStringLiteral(GROUP_BY_VALUES).withDefault('campaign'),
+  campaign: parseAsString.withDefault(''),
+  account: parseAsString.withDefault(''),
+};
+
+const isGroupBy = (v: string): v is GroupBy =>
+  (GROUP_BY_VALUES as readonly string[]).includes(v);
 
 function formatCell(value: unknown, kind: MetricKind | DimensionKind): string {
   if (value == null) return '—';
@@ -25,11 +36,7 @@ function formatCell(value: unknown, kind: MetricKind | DimensionKind): string {
 }
 
 export function CampaignAnalyticsTable() {
-  const [state, setState] = useQueryStates({
-    groupBy: parseAsStringLiteral(GROUP_BY_VALUES).withDefault('campaign'),
-    campaign: parseAsString.withDefault(''),
-    account: parseAsString.withDefault(''),
-  });
+  const [state, setState] = useQueryStates(searchParams);
 
   const { data: masterdata } = useQuery({
     queryKey: ['masterdata'],
@@ -43,13 +50,13 @@ export function CampaignAnalyticsTable() {
     if (state.account) filters.push({ dimension: 'account', operator: 'eq', value: state.account });
     return {
       metrics: Object.keys(allMetrics) as MetricKey[],
-      dimensions: [state.groupBy as DimensionKey],
+      dimensions: [state.groupBy],
       filters: filters.length ? filters : undefined,
       limit: 100,
     };
   }, [state]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['query', request],
     queryFn: () => fetchQuery(request),
     // Keep previous data visible while the new request is in-flight.
@@ -74,13 +81,14 @@ export function CampaignAnalyticsTable() {
 
   return (
     <div className="space-y-4 p-6">
-      {/* Toolbar */}
       <div className="flex flex-wrap gap-4">
-        <label className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">Group by</span>
           <Select
             value={state.groupBy}
-            onValueChange={(v) => setState({ groupBy: v as (typeof GROUP_BY_VALUES)[number] })}
+            onValueChange={(v) => {
+              if (isGroupBy(v)) setState({ groupBy: v });
+            }}
           >
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -93,9 +101,9 @@ export function CampaignAnalyticsTable() {
               ))}
             </SelectContent>
           </Select>
-        </label>
+        </div>
 
-        <label className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">Campaign</span>
           <Select
             value={state.campaign || '__all__'}
@@ -113,9 +121,9 @@ export function CampaignAnalyticsTable() {
               ))}
             </SelectContent>
           </Select>
-        </label>
+        </div>
 
-        <label className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">Account</span>
           <Select
             value={state.account || '__all__'}
@@ -133,12 +141,10 @@ export function CampaignAnalyticsTable() {
               ))}
             </SelectContent>
           </Select>
-        </label>
+        </div>
       </div>
 
-      {isError && (
-        <p className="text-sm text-destructive">Error: {(error as Error).message}</p>
-      )}
+      {isError && <p className="text-sm text-destructive">Could not load data.</p>}
 
       <div className="rounded-md border">
         <Table>
