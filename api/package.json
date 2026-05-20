@@ -15,6 +15,7 @@
     "@octane11/shared": "workspace:*",
     "better-sqlite3": "^11.9.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
