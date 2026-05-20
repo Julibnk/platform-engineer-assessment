@@ -1,8 +1,8 @@
 # ---- builder ----
 FROM node:20-alpine AS builder
 
-# Native build tools required by better-sqlite3
-RUN apk add --no-cache python3 make g++
+# No build tools needed: better-sqlite3 ships prebuilts for linux-x64-musl (Alpine x64).
+# prebuild-install pulls the .node binary; node-gyp rebuild is never invoked.
 RUN corepack enable && corepack prepare pnpm@9 --activate
 
 WORKDIR /repo
