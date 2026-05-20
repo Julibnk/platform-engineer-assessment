@@ -36,3 +36,11 @@ export type DataResponse = {
   rows: DataRow[];
   columns: ColumnMeta[];
 };
+
+export type MasterdataResponse = {
+  metrics: Record<string, { label: string; kind: MetricKind }>;
+  dimensions: Record<string, { label: string; kind: DimensionKind }>;
+  campaigns: string[];
+  accounts: string[];
+  channels: string[];
+};
