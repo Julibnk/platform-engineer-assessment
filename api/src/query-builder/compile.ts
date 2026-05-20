@@ -9,7 +9,6 @@
 
 // --- types ---
 
-import type { DimensionKey, MetricKey } from '@octane11/shared';
 import type { QueryAst, SelectNode } from './ast.js';
 import { metricSql, dimensionSql } from '../semantic-sql.js';
 
@@ -17,8 +16,6 @@ export type CompiledQuery = { sql: string; params: unknown[] };
 
 // --- helpers ---
 
-function lookupSql(key: MetricKey, map: Record<MetricKey, string>): string;
-function lookupSql(key: DimensionKey, map: Record<DimensionKey, string>): string;
 function lookupSql(key: string, map: Record<string, string>): string {
   const sql = map[key];
   // Defense-in-depth: this should never happen if buildAst is correct.

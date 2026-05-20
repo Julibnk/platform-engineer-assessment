@@ -10,8 +10,9 @@ export default [
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsParser,
-      parserOptions: { project: true },
-      globals: { ...globals.node, ...globals.browser },
+      // React 17+ JSX transform doesn't require React in scope;
+      // mark it readonly so no-undef doesn't flag .tsx files.
+      globals: { ...globals.node, ...globals.browser, React: 'readonly' },
     },
     plugins: { "@typescript-eslint": tsPlugin },
     rules: {
